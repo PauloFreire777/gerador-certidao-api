@@ -298,6 +298,6 @@ app.post('/generate-pdf', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+app.listen(PORT, () => {
   console.log(`Servidor de PDF ouvindo na porta ${port}`);
 });
