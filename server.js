@@ -80,7 +80,9 @@ app.listen(PORT, () => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
-
+app.get('/', (req, res) => {
+  res.send({ status: 'OK', message: 'API do gerador de PDF está no ar!' });
+});
 app.post('/generate-pdf', async (req, res) => {
   console.log('Recebi um pedido para gerar um PDF! Montando o HTML completo...');
 
@@ -89,7 +91,17 @@ app.post('/generate-pdf', async (req, res) => {
     const cssPath = path.join(__dirname, '../src/assets/main.css');
     const css = fs.readFileSync(cssPath, 'utf8');
 
-    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+    const browser = await puppeteer.launch({
+  headless: true,
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage', // Otimização importante para containers
+    '--disable-gpu',           // Não precisamos de processamento gráfico no servidor
+    '--no-zygote',             // Ajuda a evitar processos "zumbis" do Chrome
+    '--single-process'         // A mudança mais impactante para reduzir memória
+  ]
+});
     const page = await browser.newPage();
 
     const htmlContent = `
